@@ -3,24 +3,24 @@ import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
-async function main() {
+export async function seedClients() {
   const clients = [
     {
-      name: 'Client User 1',
-      email: 'client1@festival.com',
-      password: 'client123',
+      name: 'João Silva',
+      email: 'joao.silva@festival.com',
+      password: 'cliente123',
       phone: '123-456-7890',
     },
     {
-      name: 'Client User 2',
-      email: 'client2@festival.com',
-      password: 'client123',
+      name: 'Maria Oliveira',
+      email: 'maria.oliveira@festival.com',
+      password: 'cliente123',
       phone: '234-567-8901',
     },
     {
-      name: 'Client User 3',
-      email: 'client3@festival.com',
-      password: 'client123',
+      name: 'Carlos Souza',
+      email: 'carlos.souza@festival.com',
+      password: 'cliente123',
       phone: '345-678-9012',
     },
   ];
@@ -46,9 +46,3 @@ async function main() {
     });
   }
 }
-
-main()
-  .catch((e) => console.error(e))
-  .finally(async () => {
-    await prisma.$disconnect();
-  });

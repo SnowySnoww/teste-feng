@@ -1,25 +1,34 @@
 import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+import { seedAdmin } from './seed-admin';
+import { seedClients } from './seed-clients';
+import { seedItems } from './seed-items';
+import { seedOrders } from './seed-orders';
 
 const prisma = new PrismaClient();
 
-async function main() {
-  const hashedPassword = await bcrypt.hash('admin123', 10);
+export const runSeeds = async () => {
+  try {
+    console.log('🌱 Iniciando seed do banco de dados...');
 
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@festival.com' },
-    update: {},
-    create: {
-      name: 'Admin User',
-      email: 'admin@festival.com',
-      password: hashedPassword,
-      role: 'ADMIN',
-    },
-  });
-}
+    // Executar as seeds na ordem correta
+    await seedAdmin();
+    console.log('✅ Seed de admin concluída.');
 
-main()
-  .catch((e) => console.error(e))
-  .finally(async () => {
+    await seedClients();
+    console.log('✅ Seed de clientes concluída.');
+
+    await seedItems();
+    console.log('✅ Seed de itens concluída.');
+
+    await seedOrders();
+    console.log('✅ Seed de pedidos concluída.');
+
+    console.log('🎉 Seeding finalizado com sucesso!');
+  } catch (error) {
+    console.error('❌ Erro durante a execução das seeds:', error);
+  } finally {
     await prisma.$disconnect();
-  });
+  }
+};
+
+runSeeds();

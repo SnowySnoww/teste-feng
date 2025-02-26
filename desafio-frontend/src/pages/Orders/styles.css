@@ -226,11 +226,18 @@ dialog button:hover {
 }
 
 .order-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+.order-details span {
   display: flex;
-  flex-direction: row;
-  align-items: flex;
-  justify-content: space-around;
-  flex-grow: 1;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
 @media (max-width: 600px) {
