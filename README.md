@@ -92,9 +92,4 @@ Para acessar o sistema como administrador, utilize as credenciais:
   - Descrições
   - Valores
 
-## Conclusão
-Este documento fornece instruções detalhadas para a instalação e uso do sistema. Caso haja dúvidas ou problemas durante a execução, verifique os logs do backend e frontend para identificar possíveis erros.
-
-Boa sorte e bom uso da aplicação!
-
 
