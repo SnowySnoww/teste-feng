@@ -49,6 +49,8 @@ export class OrdersService {
         throw new BadRequestException('Quantity must be greater than 0');
       }
 
+      const cacheKey = 'orders:all';
+
       const itemIds = createOrdersDto.items.map((item) => item.itemId);
       const existingItems = await this.prisma.item.findMany({
         where: { id: { in: itemIds } },
@@ -101,6 +103,10 @@ export class OrdersService {
         },
       });
 
+      const orders = await this.findAll();
+
+      await this.redisService.set(cacheKey, JSON.stringify(orders), 3600);
+
       return {
         id: order.id,
         createdAt: order.createdAt,
@@ -120,13 +126,11 @@ export class OrdersService {
   async findAll(): Promise<OrderResponse[]> {
     const cacheKey = 'orders:all';
 
-    const cachedOrders = await this.redisService.get(cacheKey);
-    if (cachedOrders) {
-      return JSON.parse(cachedOrders) as OrderResponse[];
-    }
+    await this.redisService.delete(cacheKey);
 
     try {
       const orders = await this.prisma.order.findMany({
+        orderBy: { createdAt: 'desc' },
         include: {
           items: {
             include: {
@@ -150,12 +154,17 @@ export class OrdersService {
         },
       });
 
-      await this.redisService.set(cacheKey, JSON.stringify(orders), 3600);
+      console.log('Fetched orders:', orders);
 
-      return orders.map((order) => ({
+      const formattedOrders: OrderResponse[] = orders.map((order) => ({
         id: order.id,
         createdAt: order.createdAt,
-        user: order.user,
+        user: {
+          id: order.user.id,
+          name: order.user.name,
+          email: order.user.email,
+          phone: order.user.phone,
+        },
         items: order.items.map((orderItem) => ({
           name: orderItem.item.name,
           description: orderItem.item.description,
@@ -163,13 +172,25 @@ export class OrdersService {
           value: Number(orderItem.item.price),
         })),
       }));
-    } catch {
+
+      console.log('Formatted orders:', formattedOrders);
+
+      await this.redisService.set(
+        cacheKey,
+        JSON.stringify(formattedOrders),
+        3600,
+      );
+
+      return formattedOrders;
+    } catch (error) {
+      console.error('Error retrieving orders:', error);
       throw new InternalServerErrorException('Failed to retrieve orders');
     }
   }
 
   async findByUser(userId: string): Promise<OrderResponse[]> {
     const cacheKey = `orders:user:${userId}`;
+
     const cachedOrders = await this.redisService.get(cacheKey);
 
     if (cachedOrders) {

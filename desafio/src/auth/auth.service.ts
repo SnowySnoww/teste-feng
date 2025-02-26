@@ -40,7 +40,7 @@ export class AuthService {
 
   private setTokenCookie(res: Response, token: string) {
     res.cookie('auth_token', token, {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 3600000,
     });
