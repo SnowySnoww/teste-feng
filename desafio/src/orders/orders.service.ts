@@ -154,8 +154,6 @@ export class OrdersService {
         },
       });
 
-      console.log('Fetched orders:', orders);
-
       const formattedOrders: OrderResponse[] = orders.map((order) => ({
         id: order.id,
         createdAt: order.createdAt,
@@ -172,8 +170,6 @@ export class OrdersService {
           value: Number(orderItem.item.price),
         })),
       }));
-
-      console.log('Formatted orders:', formattedOrders);
 
       await this.redisService.set(
         cacheKey,
